@@ -12,17 +12,17 @@ An extended unsynchronized JPA-EntityManager has exactly the same behaviour as a
 
 The basic difference is:
 * synchronized EntityManager: Every EntityManager is backed by a Database-Transaction and therefore needs a very short lifetime. The problem is that with this feature you have to consider detached entities or how to properly reattach entities every time your UseCase is longer (e.g. a Wizard or the Session.DefaultEditingContext)
-** The DB-Transaction starts on the creation of the EntityManager
-** Every fault is in the same DB-Transaciton than the complete EntityManager
-** Every save or rollback is in this DB-Transaction
-** If the DB-Transaction is rolled back (e.g. failure during saving) all your Entities are doomed
+    * The DB-Transaction starts on the creation of the EntityManager
+    * Every fault is in the same DB-Transaction than the complete EntityManager
+    * Every save or rollback is backed by this DB-Transaction
+    * If the DB-Transaction is rolled back (e.g. failure during saving) all your Entities are doomed
 * unsynchronized Entitymanger: This is exactly the same as the EOF-EditingContext:
-** Every fault will be executed in a short DB-Transaction which ends afterwards
-** While working with the Entities all the changes are tracked in memory (no database involved)
-** On saving a new DB-Transaction will be opened and all pending changes are sent to the database and the transaction will be commited
-** If there is a future change in the entities then this will also be tracked and persisted in the next DB-Transaction
+    * Every fault will be executed in a short DB-Transaction which ends afterwards
+    * While working with the Entities all the changes are tracked in memory (no database involved)
+    * On saving a new DB-Transaction will be opened and all pending changes will be sent to the database and the transaction will be commited
+    * If there is a future change in the entities then this will also be tracked and persisted in the next DB-Transaction
 
-To demonstrate the similarities between EOF and JPA this ProofOfConcept was created.
+To demonstrate the similarities between EOF and JPA this ProofOfConcept was created!
 
 ## Things already working
 
@@ -40,12 +40,13 @@ Due to the fact that this is a ProofOfConcept it was not implemented completely 
 * Support for DisplayGroups (The problem lies in the fact that the DisplayGroups and EODatabaseDataSource are very hardwired to EOF and every place where the calls should be rerouted to JPA have to be found)
 * Support for Enum-Datatypes (But basically here is just the @Convert Annotation missing for the attributs. But the question is if the Converters could be generated with the ModelGen-File)
 * Test if the rollback of a deleted entity in the not commited EditingContext is working
-* Calling the lifecycle-methods of the EOF-Entites with the livecycle-listeners of the JPA-entites (Both support the same type of listeners). But the current problem is that the JPA-Entity do not know the EOF-Entity and therefore cannot call methods on it. But the JPAEditingContext would know the mapping and therefore it could handle the transfer of the message (e.g. JPA-PrePersist should call the EOF-WillUpdate)
+* Calling the lifecycle-methods of the EOF-Entites with the lifecycle-listeners of the JPA-entites (Both support the same type of listeners). But the current problem is that the JPA-Entity do not know the EOF-Entity and therefore cannot call methods on it. But the JPAEditingContext would know the mapping and therefore it could handle the transfer of the message (e.g. JPA-PrePersist should call the EOF-WillUpdate)
+* Calling of the 'validateForSave'-Method before saving of an EO-EnterpriseObject
 
 ## Licencing
 
 This project is licenced under the terms of the MIT license.
-But keep in mind that Apple has the Copyright of webobjects and therefore to the API of the lasses in the com.webobjects-package. Apple could claim that the classes in the com.webobjects-package of this project are not allowed to exist!
+But keep in mind that Apple has the Copyright of WebObjects and therefore the copyright to the API of the classes in the com.webobjects-package. Apple could claim that the classes in the com.webobjects-package of this project are not allowed to exist!
 
 ## Setup to test this in your own application
 1. Some internal EOF-Classes have to be replaced with new implementations. The new implementations are in the com.webobjects-packages. If you place them directly in your application-source-folder then they will be used instead of the classes by Webobjects
@@ -57,7 +58,7 @@ But keep in mind that Apple has the Copyright of webobjects and therefore to the
 7. Start the 'EOGenerate' with the EOTemplates in this project (They will create the JPA-Layer)
 8. Set the new EditingContext-Factory (ERXEC.setFactory(new JPAFactory());)
 
-Examples of generated EOF-JPA-Compatibility-Classes are in this project: The objects 'User' and 'UserGroup'
+Examples of generated EOF-JPA-Compatibility-Classes are in this project: The example objects are 'User' and 'UserGroup'
 
 ## Some (hopefully interesting) notes
 **EO-PK-Table**
@@ -68,14 +69,14 @@ Examples of generated EOF-JPA-Compatibility-Classes are in this project: The obj
 * This behaviour is used in the JPAEditingContext with the IdentityHashMap
 
 **Save the changes of the EditingContext**
-* To commit the changes to the database the JPAEditingContext just starts a new DB-Transactions and commits it directly. All pending changes (inserts, updates, deletes) to this point in time will be sent to the database
+* To commit the changes to the database the JPAEditingContext just starts a new DB-Transaction and commits it directly. All pending changes in the entities of the JPA-Entities (inserts, updates, deletes) up to this point will be sent to the database
 
 **Revert the changes of the EditingContext**
 * All JPA-Entites will be replaced by faults in a new EntityManager and therefore all changes in the entites will be forgotten. So the next usage of the entity will fetch the data from the database.
 
-**EO-Entities wraps JPA-Entities*
+**EO-Entities wraps JPA-Entities**
 * The reason for this is that the EO-Entities live far longer than the JPA-Entities. See notes on rollback!
-* For this reason inheritance was not possible (e.g. EO-Entites cannot inherit from JPA-Entities because the JPA-Entities will be replaced but the EO-Entities lives on)
+* For this reason inheritance was not possible (e.g. EO-Entites cannot inherit from JPA-Entities because the JPA-Entities will be replaced but the EO-Entities will live on)
 
 **Execute the EOF-Fetches with JPA**
-* Both EOF and JPA have the feature that a fetch can be written as string (e.g. 'select x from y ...'). This string-syntaxes are so somiliar that an EOF-Query-String can easily be rewritten as JPA-Query-String. This is used for the execution of the modeled fetches.
+* Both EOF and JPA have the feature that a fetch can be written as string (e.g. 'select x from y ...'). This string-syntaxes are so similar that an EOF-Query-String can easily be rewritten as JPA-Query-String. This is used for the execution of the modeled fetches.
