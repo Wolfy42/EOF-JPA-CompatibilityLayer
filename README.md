@@ -10,6 +10,8 @@ If this CompatibilityLayer would be complete it would be a DropIn-Replacment of 
 
 An extended unsynchronized JPA-EntityManager has exactly the same behaviour as an EOF-EditingContext. Most of the examples of JPA in the web are working completely different to EOF because they are using a synchronized EntityManager.
 
+The key to the possibility of a compatibility layer between EOF and JPA is the Unsynchronized-EntityManager-Feature. Without this it would not be possible or very complicated to simulate the exact same behaviour!
+
 The basic difference is:
 * synchronized EntityManager: Every EntityManager is backed by a Database-Transaction and therefore needs a very short lifetime. The problem is that with this feature you have to consider detached entities or how to properly reattach entities every time your UseCase is longer (e.g. a Wizard or the Session.DefaultEditingContext)
     * The DB-Transaction starts on the creation of the EntityManager
@@ -23,6 +25,7 @@ The basic difference is:
     * If there is a future change in the entities then this will also be tracked and persisted in the next DB-Transaction
 
 To demonstrate the similarities between EOF and JPA this ProofOfConcept was created!
+A great article about the 'unsynchronized' Feature is here: http://www.thoughts-on-java.org/unsychronized-persistencecontext-implement-conversations-jpa/
 
 ## Things already working
 
@@ -39,7 +42,6 @@ Due to the fact that this is a ProofOfConcept it was not implemented completely 
 * Execute the EOF-Fetches which were create in Java-Code (EOFetchSpecifications). But here the same principle than executing modeled fetches could be used
 * Support for DisplayGroups (The problem lies in the fact that the DisplayGroups and EODatabaseDataSource are very hardwired to EOF and every place where the calls should be rerouted to JPA have to be found)
 * Support for Enum-Datatypes (But basically here is just the @Convert Annotation missing for the attributs. But the question is if the Converters could be generated with the ModelGen-File)
-* Test if the rollback of a deleted entity in the not commited EditingContext is working
 * Calling the lifecycle-methods of the EOF-Entites with the lifecycle-listeners of the JPA-entites (Both support the same type of listeners). But the current problem is that the JPA-Entity do not know the EOF-Entity and therefore cannot call methods on it. But the JPAEditingContext would know the mapping and therefore it could handle the transfer of the message (e.g. JPA-PrePersist should call the EOF-WillUpdate)
 * Calling of the 'validateForSave'-Method before saving of an EO-EnterpriseObject
 
@@ -49,6 +51,7 @@ This project is licenced under the terms of the MIT license.
 But keep in mind that Apple has the Copyright of WebObjects and therefore the copyright to the API of the classes in the com.webobjects-package. Apple could claim that the classes in the com.webobjects-package of this project are not allowed to exist!
 
 ## Setup to test this in your own application
+### The manual approach
 1. Some internal EOF-Classes have to be replaced with new implementations. The new implementations are in the com.webobjects-packages. If you place them directly in your application-source-folder then they will be used instead of the classes by Webobjects
 2. Some Wonder-Classes have to be replaced. They are in the er.extensions.eof-package
 3. The new JPA-Classes have to be added. They are in the er.extensions.jpa-package
@@ -58,7 +61,8 @@ But keep in mind that Apple has the Copyright of WebObjects and therefore the co
 7. Start the 'EOGenerate' with the EOTemplates in this project (They will create the JPA-Layer)
 8. Set the new EditingContext-Factory (ERXEC.setFactory(new JPAFactory());)
 
-Examples of generated EOF-JPA-Compatibility-Classes are in this project: The example objects are 'User' and 'UserGroup'
+### Sample-App
+* Have a look at the sample app as a template for setup of just use the sample app for tests
 
 ## Some (hopefully interesting) notes
 **EO-PK-Table**
@@ -80,3 +84,6 @@ Examples of generated EOF-JPA-Compatibility-Classes are in this project: The exa
 
 **Execute the EOF-Fetches with JPA**
 * Both EOF and JPA have the feature that a fetch can be written as string (e.g. 'select x from y ...'). This string-syntaxes are so similar that an EOF-Query-String can easily be rewritten as JPA-Query-String. This is used for the execution of the modeled fetches.
+
+**Connection releaseMode**
+* With the setting of the ReleaseMode to AfterTransaction Hibernate will release the Connection after commiting a transaction. Therefore there can be far more EdidingContexts than JDBC-Connections

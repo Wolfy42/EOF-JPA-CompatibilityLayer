@@ -27,6 +27,7 @@ public class JPAEditingContext extends EOEditingContext {
 	private EntityManager em;
 	private Map<JPAEntity, JPAEnterpriseObject<JPAEntity>> objectsInEc;
 	private List<JPAEnterpriseObject<JPAEntity>> unsavedEnterpriseObjects;
+	private List<JPAEnterpriseObject<JPAEntity>> removedEnterpriseObjects;
     
     public JPAEditingContext(EntityManagerFactory emFactory) {
 		this.emFactory = emFactory;
@@ -34,6 +35,7 @@ public class JPAEditingContext extends EOEditingContext {
 		
 		objectsInEc = Collections.synchronizedMap(new IdentityHashMap<>());
 		unsavedEnterpriseObjects = Collections.synchronizedList(new ArrayList<>());
+		removedEnterpriseObjects = Collections.synchronizedList(new ArrayList<>());
 		// TODO: EntityManager should be closed on deletion of EC
 //		em.close();
 	}
@@ -102,9 +104,7 @@ public class JPAEditingContext extends EOEditingContext {
 
 	public void deleteObject(EOEnterpriseObject eo) {
 		JPAEnterpriseObject<JPAEntity> jpaEo = (JPAEnterpriseObject<JPAEntity>)eo;
-		em.remove(jpaEo.getEntity());
-		jpaEo.setEntity(null);
-		jpaEo.resetEnterpriseObject();
+		removedEnterpriseObjects.add(jpaEo);
 	}
 
 	public void saveChanges() {
@@ -121,6 +121,11 @@ public class JPAEditingContext extends EOEditingContext {
 		for (JPAEnterpriseObject<JPAEntity> newObj: unsavedEnterpriseObjects) {
 			em.persist(newObj.getEntity());
 		}
+		for (JPAEnterpriseObject<JPAEntity> removeObj: removedEnterpriseObjects) {
+			em.remove(removeObj.getEntity());
+			removeObj.setEntity(null);
+			removeObj.resetEnterpriseObject();
+		}
 		em.getTransaction().begin();
 		em.getTransaction().commit();
 		unsavedEnterpriseObjects.clear();
@@ -134,7 +139,7 @@ public class JPAEditingContext extends EOEditingContext {
 			JPAEntity oldEntity = eo.getEntity();
 			eo.resetEnterpriseObject();
 			
-			if (!unsavedEnterpriseObjects.contains(eo) && oldEntity != null) {
+			if (!unsavedEnterpriseObjects.contains(eo)) {
 				eo.setEntity(em.getReference(eo.getJPAEntityClass(), oldEntity.getId()));
 				eosWithFaults.add(eo);
 			} else {
@@ -143,6 +148,7 @@ public class JPAEditingContext extends EOEditingContext {
 		}
 		objectsInEc.clear();
 		unsavedEnterpriseObjects.clear();
+		removedEnterpriseObjects.clear();
 		for (JPAEnterpriseObject<JPAEntity> eoToAdd : eosWithFaults) {
 			objectsInEc.put(eoToAdd.getEntity(), eoToAdd);
 		}

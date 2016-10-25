@@ -87,5 +87,26 @@ public class UserTest {
 		user2.setFirstname("otherafter");
 		
 		ec2.saveChanges();
+		
+		user.setInfo("otherbefore again");
+		ec.saveChanges();
+	}
+	
+	@Test
+	public void testCreateButRevertDelete() {
+		EOEditingContext ec = ERXEC.newEditingContext();
+		
+		User user = new User();
+		ec.insertObject(user);
+		user.setFirstname("notdobedeleted");
+		user.setTestuser(true);
+		
+		ec.saveChanges();
+		
+		ec.deleteObject(user);
+		ec.revert();
+		
+		user.setInfo("still there");
+		ec.saveChanges();
 	}
 }
