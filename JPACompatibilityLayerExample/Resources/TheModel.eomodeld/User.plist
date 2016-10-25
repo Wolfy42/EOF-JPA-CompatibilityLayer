@@ -1,0 +1,50 @@
+{
+    attributes = (
+        {
+            columnName = createDate; 
+            externalType = timestamp; 
+            name = createDate; 
+            valueClassName = NSCalendarDate; 
+            valueType = T; 
+        }, 
+        {
+            adaptorValueConversionClassName = "er.prototypes.ValueConversion"; 
+            columnName = firstname; 
+            externalType = varchar; 
+            name = firstname; 
+            valueClassName = NSString; 
+            valueFactoryClassName = "er.prototypes.ValueFactory"; 
+        }, 
+        {allowsNull = N; name = id; prototypeName = id; }, 
+        {
+            allowsNull = Y; 
+            columnName = info; 
+            externalType = varchar; 
+            name = info; 
+            valueClassName = NSString; 
+        }, 
+        {
+            columnName = testuser; 
+            externalType = tinyint; 
+            name = testuser; 
+            valueClassName = NSNumber; 
+            valueType = c; 
+        }
+    ); 
+    attributesUsedForLocking = (id); 
+    className = "at.eofjpa.model.User"; 
+    classProperties = (createDate, firstname, id, info, posts, testuser); 
+    externalName = User; 
+    fetchSpecificationDictionary = {}; 
+    name = User; 
+    primaryKeyAttributes = (id); 
+    relationships = (
+        {
+            destination = Post; 
+            isToMany = Y; 
+            joinSemantic = EOInnerJoin; 
+            joins = ({destinationAttribute = userID; sourceAttribute = id; }); 
+            name = posts; 
+        }
+    ); 
+}

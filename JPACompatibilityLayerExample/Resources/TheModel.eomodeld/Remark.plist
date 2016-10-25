@@ -1,0 +1,32 @@
+{
+    attributes = (
+        {allowsNull = N; name = id; prototypeName = id; }, 
+        {allowsNull = N; columnName = postID; name = postID; prototypeName = id; }, 
+        {
+            adaptorValueConversionClassName = "er.prototypes.ValueConversion"; 
+            columnName = text; 
+            externalType = varchar; 
+            name = text; 
+            valueClassName = NSString; 
+            valueFactoryClassName = "er.prototypes.ValueFactory"; 
+        }
+    ); 
+    attributesUsedForLocking = (id, postID); 
+    className = "at.eofjpa.model.Remark"; 
+    classProperties = (id, post, text); 
+    externalName = Remark; 
+    fetchSpecificationDictionary = {}; 
+    internalInfo = {"_javaClientClassName" = Remark; }; 
+    name = Remark; 
+    primaryKeyAttributes = (id); 
+    relationships = (
+        {
+            destination = Post; 
+            isMandatory = Y; 
+            isToMany = N; 
+            joinSemantic = EOInnerJoin; 
+            joins = ({destinationAttribute = id; sourceAttribute = postID; }); 
+            name = post; 
+        }
+    ); 
+}

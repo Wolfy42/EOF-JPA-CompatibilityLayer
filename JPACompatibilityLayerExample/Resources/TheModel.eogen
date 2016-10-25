@@ -1,0 +1,11 @@
+ -destination Sources \
+ -extension java \
+ -java \
+ -javaTemplate _JPAEntity.java \
+ -model Resources/TheModel.eomodeld \
+ -packagedirs \
+ -subclassDestination Sources \
+ -subclassJavaTemplate JPAEntity.java \
+ -templatedir ../JPACompatibilityLayer/Templates \
+ -verbose \
+ -loadModelGroup

@@ -1,0 +1,3 @@
+CREATE DATABASE eofjpa;
+
+GRANT ALL PRIVILEGES ON eofjpa.* TO eofjpa@localhost IDENTIFIED BY 'eofjpa' WITH GRANT OPTION;

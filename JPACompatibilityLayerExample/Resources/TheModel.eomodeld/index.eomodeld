@@ -1,0 +1,10 @@
+{
+    EOModelVersion = "2.1"; 
+    adaptorName = JDBC; 
+    connectionDictionary = {}; 
+    entities = (
+        {className = "at.eofjpa.model.Post"; name = Post; }, 
+        {className = "at.eofjpa.model.Remark"; name = Remark; }, 
+        {className = "at.eofjpa.model.User"; name = User; }
+    ); 
+}
