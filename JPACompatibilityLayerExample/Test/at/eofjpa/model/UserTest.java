@@ -3,14 +3,11 @@ package at.eofjpa.model;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.util.ArrayList;
-
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.webobjects.eoaccess.EOUtilities;
 import com.webobjects.eocontrol.EOEditingContext;
-import com.webobjects.foundation.NSArray;
 import com.webobjects.foundation.NSValidation;
 
 import er.extensions.eof.ERXEC;
@@ -21,15 +18,6 @@ public class UserTest {
 	@BeforeClass
 	public static void beforeClass() throws Exception {
 		ERXEC.setFactory(new JPAFactory());
-		
-		EOEditingContext ec = ERXEC.newEditingContext();
-		NSArray<User> users = User.fetchAllUsers(ec);
-		for (User user : new ArrayList<>(users)) {
-			if (user.testuser()) {
-				ec.deleteObject(user);
-			}
-		}
-		ec.saveChanges();
 	}
 	
 	@Test

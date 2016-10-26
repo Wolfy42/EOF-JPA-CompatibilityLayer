@@ -31,6 +31,7 @@ public abstract class _Post extends  JPAEnterpriseObject<_Post.PostEntity> {
 
 	// Attribute Keys
 	public static final ERXKey<Integer> ID = new ERXKey<Integer>("id");
+	public static final ERXKey<Integer> NR = new ERXKey<Integer>("nr");
 	public static final ERXKey<String> TEXT = new ERXKey<String>("text");
 	// Relationship Keys
 	public static final ERXKey<at.eofjpa.model.Remark> REMARKS = new ERXKey<at.eofjpa.model.Remark>("remarks");
@@ -38,6 +39,7 @@ public abstract class _Post extends  JPAEnterpriseObject<_Post.PostEntity> {
 
 	// Attributes
 	public static final String ID_KEY = ID.key();
+	public static final String NR_KEY = NR.key();
 	public static final String TEXT_KEY = TEXT.key();
 	// Relationships
 	public static final String REMARKS_KEY = REMARKS.key();
@@ -81,6 +83,14 @@ public abstract class _Post extends  JPAEnterpriseObject<_Post.PostEntity> {
 
 	public void setId(Integer value) {
 		entity.setId(value);
+	}
+
+	public Integer nr() {
+		return entity.getNr();
+	}
+
+	public void setNr(Integer value) {
+		entity.setNr(value);
 	}
 
 	public String text() {
@@ -197,10 +207,12 @@ public abstract class _Post extends  JPAEnterpriseObject<_Post.PostEntity> {
 
 
 	public static Post createPost(EOEditingContext editingContext, Integer id
+, Integer nr
 , String text
 , at.eofjpa.model.User user) {
 		Post eo = (Post) JPAUtilities.createAndInsertInstance(editingContext, _Post.ENTITY_DEF);    
 		eo.setId(id);
+		eo.setNr(nr);
 		eo.setText(text);
 		eo.setUserRelationship(user);
 		return eo;
@@ -264,9 +276,72 @@ public abstract class _Post extends  JPAEnterpriseObject<_Post.PostEntity> {
 		return jpaEc.getEnterpriseObject(ENTITY_DEF, jpaEc.getEm().merge(eo.getEntity()));
 	}
 
+	public static NSArray<at.eofjpa.model.Post> fetchPostsForUser(EOEditingContext ec, NSDictionary<String, Object> bindings) {
+		return fetchPostsForUser(ec
+, (at.eofjpa.model.User)bindings.get("user"));
+	}
+  
+	public static NSArray<at.eofjpa.model.Post> fetchPostsForUser(EOEditingContext ec
+ , at.eofjpa.model.User userBinding) {	
+		JPAEditingContext jpaEc = (JPAEditingContext)ec;
+		List<PostEntity> results = new PostDAO(jpaEc.getEm()).fetchPostsForUser(
+userBinding.getEntity());
+		NSArray<at.eofjpa.model.Post> resultsEO = new NSMutableArray<>();
+		for (PostEntity o : results) {
+			at.eofjpa.model.Post result = new at.eofjpa.model.Post();
+			resultsEO.add(result);
+			result.setEntity(o);
+			result.setEc(jpaEc);
+		}
+		return resultsEO;
+	}
+  
+	public static NSArray<NSDictionary> fetchRawDistinctTextForUser(EOEditingContext ec, NSDictionary<String, Object> bindings) {
+		return fetchRawDistinctTextForUser(ec
+, (at.eofjpa.model.User)bindings.get("user"));
+	}
+  
+	public static NSArray<NSDictionary> fetchRawDistinctTextForUser(EOEditingContext ec
+ , at.eofjpa.model.User userBinding) {	
+		JPAEditingContext jpaEc = (JPAEditingContext)ec;
+		List<Map<String, Object>> results = new PostDAO(jpaEc.getEm()).fetchRawDistinctTextForUser(
+userBinding.getEntity());
+		NSArray<NSDictionary> nsResults = new NSMutableArray<>();
+		for (Map<String, Object> result : results) {
+			NSDictionary nsResult = new NSMutableDictionary();
+			nsResults.add(nsResult);
+			for (String key : result.keySet()) {
+				nsResult.takeValueForKey(result.get(key), key);
+			}
+		}
+		return nsResults;
+	}
+  
+	public static NSArray<NSDictionary> fetchRawForUserAndNrDesc(EOEditingContext ec, NSDictionary<String, Object> bindings) {
+		return fetchRawForUserAndNrDesc(ec
+, (Integer)bindings.get("nrMax"), (Integer)bindings.get("nrMin"), (at.eofjpa.model.User)bindings.get("user"));
+	}
+  
+	public static NSArray<NSDictionary> fetchRawForUserAndNrDesc(EOEditingContext ec
+ , Integer nrMaxBinding , Integer nrMinBinding , at.eofjpa.model.User userBinding) {	
+		JPAEditingContext jpaEc = (JPAEditingContext)ec;
+		List<Map<String, Object>> results = new PostDAO(jpaEc.getEm()).fetchRawForUserAndNrDesc(
+nrMaxBinding, nrMinBinding, userBinding.getEntity());
+		NSArray<NSDictionary> nsResults = new NSMutableArray<>();
+		for (Map<String, Object> result : results) {
+			NSDictionary nsResult = new NSMutableDictionary();
+			nsResults.add(nsResult);
+			for (String key : result.keySet()) {
+				nsResult.takeValueForKey(result.get(key), key);
+			}
+		}
+		return nsResults;
+	}
+  
 	@StaticMetamodel(PostEntity.class)
 	public static class PostEntity_ extends JPAEntity_ {
 		
+		public static volatile SingularAttribute<Post, Integer> nr;
 		public static volatile SingularAttribute<Post, String> text;
 		public static volatile SingularAttribute<Post, _User.UserEntity> user;
 		public static volatile ListAttribute<Post, _Remark.RemarkEntity> remarks;
@@ -275,6 +350,10 @@ public abstract class _Post extends  JPAEnterpriseObject<_Post.PostEntity> {
 	@Entity
 	@Table(name = "Post")
 	public static class PostEntity extends JPAEntityImpl {
+
+		@Column(name = "nr", nullable = false)
+		@NotNull
+		private Integer nr;
 
 		@Column(name = "text", nullable = false)
 		@NotNull
@@ -288,6 +367,12 @@ public abstract class _Post extends  JPAEnterpriseObject<_Post.PostEntity> {
 		@OneToMany(mappedBy="post", fetch = FetchType.LAZY)
 		private List<_Remark.RemarkEntity> remarks = new ArrayList<>();
 
+		public Integer getNr() {
+			return nr;
+		}
+		public void setNr(Integer nr) {
+			this.nr = nr;
+		}
 		public String getText() {
 			return text;
 		}
@@ -324,5 +409,135 @@ public abstract class _Post extends  JPAEnterpriseObject<_Post.PostEntity> {
 			return tq.getResultList();
 		}
 		
+		public List<PostEntity> fetchPostsForUser(
+				at.eofjpa.model._User.UserEntity user
+				) {
+			String emfQuery = "user = $user";
+			EOQualifier qualifier = EOQualifier.qualifierWithQualifierFormat(emfQuery, null);
+			NSMutableDictionary<String, Object> bindings = new NSMutableDictionary<String, Object>();
+			if (user != null) {
+				bindings.takeValueForKey(":user", "user");
+			}
+			EOQualifier qualforBindings = qualifier.qualifierWithBindings(bindings, false);
+			String jpqlWhere = qualforBindings.toString();
+			jpqlWhere = jpqlWhere.replace("':user'", ":user");
+			for (Object key : qualforBindings.allQualifierKeys()) {
+				jpqlWhere = jpqlWhere.replace("("+(String)key, "(e." + (String)key);
+			}
+			String select = "select";
+			select = select + " e";
+			String jpqlSortOrderings = "";
+			jpqlSortOrderings += " e.nr asc ";
+			if (!jpqlSortOrderings.isEmpty()) {
+				jpqlSortOrderings = " ORDER BY " + jpqlSortOrderings;
+			}
+			String jpqlQuery = select +" from _Post$PostEntity e where " + jpqlWhere + jpqlSortOrderings;
+			TypedQuery< PostEntity> query = em.createQuery(jpqlQuery, PostEntity.class);
+			if (user != null) {
+				query.setParameter("user", user);
+			}
+			return query.getResultList();
+		}
+
+		public List<Map<String, Object>> fetchRawDistinctTextForUser(
+				at.eofjpa.model._User.UserEntity user
+				) {
+			String emfQuery = "user = $user";
+			EOQualifier qualifier = EOQualifier.qualifierWithQualifierFormat(emfQuery, null);
+			NSMutableDictionary<String, Object> bindings = new NSMutableDictionary<String, Object>();
+			if (user != null) {
+				bindings.takeValueForKey(":user", "user");
+			}
+			EOQualifier qualforBindings = qualifier.qualifierWithBindings(bindings, false);
+			String jpqlWhere = qualforBindings.toString();
+			jpqlWhere = jpqlWhere.replace("':user'", ":user");
+			for (Object key : qualforBindings.allQualifierKeys()) {
+				jpqlWhere = jpqlWhere.replace("("+(String)key, "(e." + (String)key);
+			}
+			String select = "select";
+			select = select + " distinct";
+			select = select + " e.text";
+			String jpqlSortOrderings = "";
+			jpqlSortOrderings += " e.text asc ";
+			if (!jpqlSortOrderings.isEmpty()) {
+				jpqlSortOrderings = " ORDER BY " + jpqlSortOrderings;
+			}
+			String jpqlQuery = select +" from _Post$PostEntity e where " + jpqlWhere + jpqlSortOrderings;
+			TypedQuery<  Object> query = em.createQuery(jpqlQuery,  Object.class);
+			if (user != null) {
+				query.setParameter("user", user);
+			}
+			List<Object> rawDataList = query.getResultList();
+			List<Map<String, Object>> results = new ArrayList<>(rawDataList.size());
+			for (Object result :rawDataList) {
+				Map<String, Object> resultMap = new HashMap<>();
+				results.add(resultMap);
+				resultMap.put("text", JPAUtilities.convertRawData(result));
+			}
+			return results;
+		}
+
+		public List<Map<String, Object>> fetchRawForUserAndNrDesc(
+				Integer nrMax
+				, Integer nrMin
+				, at.eofjpa.model._User.UserEntity user
+				) {
+			String emfQuery = "user = $user and nr >= $nrMin and nr <= $nrMax";
+			EOQualifier qualifier = EOQualifier.qualifierWithQualifierFormat(emfQuery, null);
+			NSMutableDictionary<String, Object> bindings = new NSMutableDictionary<String, Object>();
+			if (nrMax != null) {
+				bindings.takeValueForKey(":nrMax", "nrMax");
+			}
+			if (nrMin != null) {
+				bindings.takeValueForKey(":nrMin", "nrMin");
+			}
+			if (user != null) {
+				bindings.takeValueForKey(":user", "user");
+			}
+			EOQualifier qualforBindings = qualifier.qualifierWithBindings(bindings, false);
+			String jpqlWhere = qualforBindings.toString();
+			jpqlWhere = jpqlWhere.replace("':nrMax'", ":nrMax");
+			jpqlWhere = jpqlWhere.replace("':nrMin'", ":nrMin");
+			jpqlWhere = jpqlWhere.replace("':user'", ":user");
+			for (Object key : qualforBindings.allQualifierKeys()) {
+				jpqlWhere = jpqlWhere.replace("("+(String)key, "(e." + (String)key);
+			}
+			String select = "select";
+			select = select + " e.nr";
+			select = select + ", e.text";
+			select = select + ", e.user.firstname";
+			String jpqlSortOrderings = "";
+			jpqlSortOrderings += " e.nr desc ";
+			if (!jpqlSortOrderings.isEmpty()) {
+				jpqlSortOrderings = " ORDER BY " + jpqlSortOrderings;
+			}
+			String jpqlQuery = select +" from _Post$PostEntity e where " + jpqlWhere + jpqlSortOrderings;
+			TypedQuery< Object[]> query = em.createQuery(jpqlQuery, Object[].class);
+			if (nrMax != null) {
+				query.setParameter("nrMax", nrMax);
+			}
+			if (nrMin != null) {
+				query.setParameter("nrMin", nrMin);
+			}
+			if (user != null) {
+				query.setParameter("user", user);
+			}
+			List<Object[]> rawDataList = query.getResultList();
+			List<Map<String, Object>> results = new ArrayList<>(rawDataList.size());
+			int idx;
+			for (Object[] result :rawDataList) {
+				idx = 0;
+				Map<String, Object> resultMap = new HashMap<>();
+				results.add(resultMap);
+				resultMap.put("nr", JPAUtilities.convertRawData(result[idx]));
+				idx++;
+				resultMap.put("text", JPAUtilities.convertRawData(result[idx]));
+				idx++;
+				resultMap.put("user.firstname", JPAUtilities.convertRawData(result[idx]));
+				idx++;
+			}
+			return results;
+		}
+
 	}
 }

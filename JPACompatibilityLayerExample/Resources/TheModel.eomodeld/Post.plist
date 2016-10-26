@@ -2,6 +2,13 @@
     attributes = (
         {allowsNull = N; name = id; prototypeName = id; }, 
         {
+            columnName = nr; 
+            externalType = int; 
+            name = nr; 
+            valueClassName = NSNumber; 
+            valueType = i; 
+        }, 
+        {
             adaptorValueConversionClassName = "er.prototypes.ValueConversion"; 
             columnName = text; 
             externalType = varchar; 
@@ -13,9 +20,8 @@
     ); 
     attributesUsedForLocking = (id, userID); 
     className = "at.eofjpa.model.Post"; 
-    classProperties = (id, remarks, text, user); 
+    classProperties = (id, nr, remarks, text, user); 
     externalName = Post; 
-    fetchSpecificationDictionary = {}; 
     name = Post; 
     primaryKeyAttributes = (id); 
     relationships = (

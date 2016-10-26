@@ -1,0 +1,58 @@
+{
+    postsForUser = {
+        class = EOFetchSpecification; 
+        entityName = Post; 
+        prefetchingRelationshipKeyPaths = (); 
+        qualifier = {
+            class = EOKeyValueQualifier; 
+            key = user; 
+            selectorName = "isEqualTo:"; 
+            value = {"_key" = user; class = EOQualifierVariable; }; 
+        }; 
+        sortOrderings = ({class = EOSortOrdering; key = nr; selectorName = compareAscending; }); 
+    }; 
+    rawDistinctTextForUser = {
+        class = EOFetchSpecification; 
+        entityName = Post; 
+        prefetchingRelationshipKeyPaths = (); 
+        qualifier = {
+            class = EOKeyValueQualifier; 
+            key = user; 
+            selectorName = "isEqualTo:"; 
+            value = {"_key" = user; class = EOQualifierVariable; }; 
+        }; 
+        rawRowKeyPaths = (text); 
+        sortOrderings = ({class = EOSortOrdering; key = text; selectorName = compareAscending; }); 
+        usesDistinct = YES; 
+    }; 
+    rawForUserAndNrDesc = {
+        class = EOFetchSpecification; 
+        entityName = Post; 
+        prefetchingRelationshipKeyPaths = (); 
+        qualifier = {
+            class = EOAndQualifier; 
+            qualifiers = (
+                {
+                    class = EOKeyValueQualifier; 
+                    key = user; 
+                    selectorName = "isEqualTo:"; 
+                    value = {"_key" = user; class = EOQualifierVariable; }; 
+                }, 
+                {
+                    class = EOKeyValueQualifier; 
+                    key = nr; 
+                    selectorName = "isGreaterThanOrEqualTo:"; 
+                    value = {"_key" = nrMin; class = EOQualifierVariable; }; 
+                }, 
+                {
+                    class = EOKeyValueQualifier; 
+                    key = nr; 
+                    selectorName = "isLessThanOrEqualTo:"; 
+                    value = {"_key" = nrMax; class = EOQualifierVariable; }; 
+                }
+            ); 
+        }; 
+        rawRowKeyPaths = (nr, text, "user.firstname"); 
+        sortOrderings = ({class = EOSortOrdering; key = nr; selectorName = compareDescending; }); 
+    }; 
+}
