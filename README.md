@@ -51,7 +51,7 @@ This project is licenced under the terms of the MIT license.
 But keep in mind that Apple has the Copyright of WebObjects and therefore the copyright to the API of the classes in the com.webobjects-package. Apple could claim that the classes in the com.webobjects-package of this project are not allowed to exist!
 
 ## Setup to test this in your own application
-### The manual approach
+### Use the manual approach
 1. Some internal EOF-Classes have to be replaced with new implementations. The new implementations are in the com.webobjects-packages. If you place them directly in your application-source-folder then they will be used instead of the classes by Webobjects
 2. Some Wonder-Classes have to be replaced. They are in the er.extensions.eof-package
 3. The new JPA-Classes have to be added. They are in the er.extensions.jpa-package
@@ -61,8 +61,8 @@ But keep in mind that Apple has the Copyright of WebObjects and therefore the co
 7. Start the 'EOGenerate' with the EOTemplates in this project (They will create the JPA-Layer)
 8. Set the new EditingContext-Factory (ERXEC.setFactory(new JPAFactory());)
 
-### Sample-App
-* Have a look at the sample app as a template for setup of just use the sample app for tests
+### Or the Sample-App
+* Have a look at the sample app as a template for setup or just use the sample app for tests
 
 ## Some (hopefully interesting) notes
 **EO-PK-Table**
