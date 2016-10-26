@@ -1,9 +1,47 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
 <html>
 	<head>
-		<title>Untitled</title>
+		<title>EOF-JPA-Tests</title>
 	</head>
 	<body>
-Hello World
+		<h1>Users</h1>
+		<wo:form multipleSubmit = "$true">
+			<table>
+				<thead>
+					<tr>
+						<td>Firstname</td>
+						<td>Info</td>
+						<td></td>
+					</tr>
+				</thead>
+				<tbody
+					<wo:repeat list = "$userList" item = "$userItem">
+						<tr>
+							<td>
+								<wo:text value = "$userItem.firstname"/>
+							</td>
+							<td>
+								<wo:text value = "$userItem.info"/>
+							</td>
+							<td>
+								<wo:submit action = "$deleteUser" value = "Delete User"/>
+							</td>
+						</tr>
+					</wo:repeat>
+				</tbody>
+			</table>
+			
+			<wo:submit action = "$addUser" value = "Add User"/>
+			<br/>
+			
+			<wo:submit action = "$save" value = "Save"/>
+			<wo:submit action = "$revert" value = "Revert"/>
+		</wo:form>
+		
+		<wo:if condition = "$error">
+			<strong>Error:</strong>
+			<wo:str value = "$error"/>
+		</wo:if>
+
 	</body>
 </html>

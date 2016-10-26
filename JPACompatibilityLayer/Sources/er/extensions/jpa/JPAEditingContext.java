@@ -112,11 +112,9 @@ public class JPAEditingContext extends EOEditingContext {
 		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
 		Validator validator = factory.getValidator();
 		for (JPAEnterpriseObject<JPAEntity> newObj: unsavedEnterpriseObjects) {
-			Set<ConstraintViolation<JPAEntity>> constraints = validator.validate(newObj.getEntity());
-			for (ConstraintViolation<JPAEntity> constraint : constraints) {
-				throw new NSValidation.ValidationException(constraint.getMessage(), newObj, constraint.getPropertyPath().toString());
-			}
+			validateEOEntity(validator, newObj);
 		}
+		//TODO: validate changed objects before starting a DB-Transaction!
 		
 		for (JPAEnterpriseObject<JPAEntity> newObj: unsavedEnterpriseObjects) {
 			em.persist(newObj.getEntity());
@@ -129,6 +127,14 @@ public class JPAEditingContext extends EOEditingContext {
 		em.getTransaction().begin();
 		em.getTransaction().commit();
 		unsavedEnterpriseObjects.clear();
+	}
+
+	private void validateEOEntity(Validator validator, JPAEnterpriseObject<JPAEntity> eoEntity) {
+		Set<ConstraintViolation<JPAEntity>> constraints = validator.validate(eoEntity.getEntity());
+		for (ConstraintViolation<JPAEntity> constraint : constraints) {
+			String key = constraint.getPropertyPath().toString();
+			throw new NSValidation.ValidationException(key + " " + constraint.getMessage(), eoEntity, key);
+		}
 	}
 
 	public void revert() {
