@@ -34,16 +34,18 @@ There are a lot of things already working. There could be not detected edge case
 * Reroute many EOF-Calls to the JPA-Classes
 * All CRUD-Operations
 * Executing modeled EOF-Fetches with JPA (also including SortOrderings and raw fetches)
+* Execute the EOF-Fetches which were create in Java-Code (ERXFetchSpecifications).
 * Running in a WO-Application (yes, that's already working)
 
 ## Things still open
 
 Due to the fact that this is a ProofOfConcept it was not implemented completely and therefore some features are missing:
-* Execute the EOF-Fetches which were create in Java-Code (EOFetchSpecifications). But here the same principle than executing modeled fetches could be used
 * Support for DisplayGroups (The problem lies in the fact that the DisplayGroups and EODatabaseDataSource are very hardwired to EOF and every place where the calls should be rerouted to JPA have to be found)
 * Support for Enum-Datatypes (But basically here is just the @Convert Annotation missing for the attributs. But the question is if the Converters could be generated with the ModelGen-File)
 * Calling the lifecycle-methods of the EOF-Entites with the lifecycle-listeners of the JPA-entites (Both support the same type of listeners). But the current problem is that the JPA-Entity do not know the EOF-Entity and therefore cannot call methods on it. But the JPAEditingContext would know the mapping and therefore it could handle the transfer of the message (e.g. JPA-PrePersist should call the EOF-WillUpdate)
 * Calling of the 'validateForSave'-Method before saving of an EO-EnterpriseObject
+* EOFFetchSpecification's distinct and raw-fetches (but here the same principle than for the modelled fetches can be used)
+* EOFFetchSpecification's pre-fetching
 
 ## Licencing
 
